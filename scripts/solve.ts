@@ -16,11 +16,24 @@ await scaffold(day, year)
 
 const name = `${day}`.padStart(2, '0')
 
-const { default: input } = await import(`@/${name}/input.txt`)
-const { partOne, partTwo, parse } = await import(`@/${name}/${name}.ts`)
+const { default: actualInput } = await import(`@/${name}/input.txt`)
+const { default: exampleInput } = await import(`@/${name}/example.txt`)
+const { TEST_MODE, partOne, partOneTests, partTwo, partTwoTests, parse } =
+  await import(`@/${name}/${name}.ts`)
 
-const [one, onePerformance] = withPerformance(() => partOne?.(parse(input)))
-const [two, twoPerformance] = withPerformance(() => partTwo?.(parse(input)))
+let input = actualInput
+let partOneFn = partOne
+let partTwoFn = partTwo
+
+if (TEST_MODE) {
+  input = exampleInput
+  partOneFn = partOneTests
+  partTwoFn = partTwoTests
+  console.log(`🧪 Running tests for day ${day} of ${year}`)
+}
+
+const [one, onePerformance] = withPerformance(() => partOneFn?.(parse(input)))
+const [two, twoPerformance] = withPerformance(() => partTwoFn?.(parse(input)))
 
 console.log(
   '🌲',
